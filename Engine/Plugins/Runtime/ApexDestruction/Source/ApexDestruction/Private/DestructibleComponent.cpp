@@ -47,11 +47,98 @@ UDestructibleComponent::UDestructibleComponent(const FObjectInitializer& ObjectI
 
 	SetComponentSpaceTransformsDoubleBuffering(false);
 
+	/** extra variable by xenophont */
+	bApplyImpulseOnDamage = true;
+
 #if WITH_PHYSX
 	// Get contact offset params
 	FBodySetupShapeIterator::GetContactOffsetParams(ContactOffsetFactor, MinContactOffset, MaxContactOffset);
 #endif //WITH_PHYSX
 }
+
+/** Extra function by Xenophont */
+void UDestructibleComponent::destroySelf()
+{
+	DestroyComponent();
+}
+
+/** Extra function by Xenophont */
+bool UDestructibleComponent::checkIfShouldDestroy()
+{
+	uint32 ChunkCount = GetAllSocketNames().Num();
+
+	float dynamicChunks = 0.f;
+	float destructionPercentage = 0.f;
+
+	for (uint32 i = 1; i < ChunkCount; ++i)
+	{
+		//si el actor NO es dinamico
+		//if (ApexDestructibleActor->isDynamic(i))
+		if (ApexDestructibleActor->isChunkDestroyed(i))
+		{
+			//chunks no rotos
+			dynamicChunks++;
+		}
+		else
+		{
+			//chunks dinamicos
+
+		}
+	}
+
+	AddRadialImpulse(GetComponentLocation(), 100, impulseOnFracture, ERadialImpulseFalloff::RIF_Constant, false);
+
+	ChunkCount -= 2;
+	if (printDestructionPercentage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Total Chunks: %f"), (float)ChunkCount);
+		UE_LOG(LogTemp, Warning, TEXT("Dynamic Chunks: %f"), dynamicChunks);
+	}
+
+	destructionPercentage = (dynamicChunks / (float)ChunkCount) * 100;
+
+	if (printDestructionPercentage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Destruction Percentage: %f"), destructionPercentage);
+	}
+
+
+	//Comprobacion de porcentaje de destruccion
+	if (destructionPercentage >= destructionPercentageThreshold && destroying == false && should_Check_Destruction)
+	{
+		destroying = true;
+
+		FTimerDelegate TimerDel;
+
+		FTimerHandle TimerHandle;
+
+		TimerDel.BindUFunction(this, FName("destroySelf"));
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, 1, false, timerToDestroy);
+
+
+	}
+
+
+
+	if (destroying == false && checking_destruction == false && should_Check_Destruction)
+	{
+		checking_destruction = true;
+
+		FTimerDelegate TimerDel;
+
+		FTimerHandle TimerHandle;
+
+		TimerDel.BindUFunction(this, FName("checkIfShouldDestroyByDistance"));
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, 1, false, timerToDestroy);
+	}
+
+
+	return destroying;
+
+}
+
 
 #if WITH_EDITORONLY_DATA
 void UDestructibleComponent::Serialize(FArchive& Ar)
@@ -712,9 +799,70 @@ void UDestructibleComponent::OnVisibilityEvent(const apex::ChunkStateEventData &
 		//				if (Event.event & physx::NxDestructibleChunkEvent::VisibilityChanged)
 		const bool bIsVisible = (Event.event & apex::DestructibleChunkEvent::ChunkVisible) != 0;
 		SetChunkVisible(Event.chunkIndex, bIsVisible);
+
+		/** Extra code by Xenophont*/
+
+		//UE_LOG(LogTemp, Warning, TEXT(" prueba prueba"));
+		if (!firstTime && should_Check_Destruction)
+			checkIfShouldDestroy();
+		else
+			firstTime = false;
 	}
 }
 #endif // WITH_APEX
+
+/** Extra Function by Xenophont */
+void UDestructibleComponent::checkIfShouldDestroyByDistance()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT(" Chequeando si debe destruir por distancia"));
+
+	int valid_chunks = 0;
+	bool must_Destroy = false;
+	float chunk_Dist_To_Origin = 0;
+
+	for (int i = 0; i < bones_Names.Num() - 2; i++)
+	{
+
+		current_Location[i] = (GetBoneLocation(bones_Names[i + 2], EBoneSpaces::WorldSpace));
+
+		chunk_Dist_To_Origin = FVector::Distance(initial_Location[i], GetBoneLocation(bones_Names[i + 2], EBoneSpaces::WorldSpace));
+
+		if (chunk_Dist_To_Origin < destruction_Distance_Limit)
+			valid_chunks++;
+
+	}
+
+	if (valid_chunks < 2)
+		must_Destroy = true;
+
+	/*
+	TArray <FName> names = this->GetAllSocketNames();
+
+
+	for (int i = 0; i < names.Num(); i++)
+	{
+	UE_LOG(LogTemp, Warning, TEXT("la pieza %s tiene por posicion %s"), *names[i].ToString(), *GetBoneLocation(*names[i].ToString(), EBoneSpaces::WorldSpace).ToString());
+	}
+	*/
+
+	//current_Location = GetBoneLocation("Part0", EBoneSpaces::WorldSpace );
+
+	//UE_LOG(LogTemp, Warning, TEXT(" x , y , z : %f, %f, %f"), current_Location.X, current_Location.Y, current_Location.Z);
+
+	//current_Location = P2UVector(ApexDestructibleActor->getChunkPhysXActor(0)->getWorldBounds().getCenter());
+
+	//current_Location = P2UVector(ApexDestructibleActor->getChunkPhysXActor(0)->getWorldBounds().getCenter()); //GetComponentLocation();
+	//current_Distance_To_Origin = FVector::Distance(initial_Location, current_Location);
+
+	checking_destruction = false;
+
+	if (must_Destroy && destroying == false && !IsBeingDestroyed())
+	{
+		destroySelf();
+	}
+
+}
 
 bool UDestructibleComponent::IsFracturedOrInitiallyStatic() const
 {

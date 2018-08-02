@@ -212,6 +212,21 @@ class ENGINE_API UInstancedStaticMeshComponent : public UStaticMeshComponent
 	virtual void PostLoad() override;
 	virtual void OnComponentCreated() override;
 
+	/** Extra Functions made By Xenophont */
+
+	/** Returns the instances with instance bounds overlapping the specified sphere using an extra offset. The return value is an array of instance indices. */
+	UFUNCTION(BlueprintCallable, Category = "Components|InstancedStaticMesh")
+		virtual TArray<int32> GetInstancesOverlappingSphereWithOffset(const FVector& Center, float Radius, FVector Offset, bool bSphereInWorldSpace = true) const;
+
+	/** Returns the instances with instance bounds overlapping the specified sphereusing an extra offset and forcing the scale. The return value is an array of instance indices. */
+	UFUNCTION(BlueprintCallable, Category = "Components|InstancedStaticMesh")
+		virtual TArray<int32> GetInstancesOverlappingSphereWithOffsetWithForcedScale(const FVector& Center, float Radius, FVector Offset, float ForcedScale, bool bSphereInWorldSpace = true, bool bShouldPrint = false) const;
+
+	/** Returns the instances with instance box bounds overlapping the specified sphere using an extra offset. The return value is an array of instance indices. */
+	UFUNCTION(BlueprintCallable, Category = "Components|InstancedStaticMesh")
+		virtual TArray<int32> GetInstancesOverlappingSphereAgainstBBoxWithOffset(const FVector& Center, float Radius, FVector Offset, bool bSphereInWorldSpace = true, bool bShouldPrint = false) const;
+
+
 public:
 	/** Render data will be initialized on PostLoad or on demand. Released on the rendering thread. */
 	TSharedPtr<FPerInstanceRenderData, ESPMode::ThreadSafe> PerInstanceRenderData;

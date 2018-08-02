@@ -51,6 +51,54 @@ class APEXDESTRUCTION_API UDestructibleComponent : public USkinnedMeshComponent,
 {
 	GENERATED_UCLASS_BODY()
 
+	/** Extra Variables by Xenophont */
+
+	/** Check if the destructible should count its chunks to autodelete itself from memory */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DestructibleComponent)
+		bool should_Check_Destruction = false;
+
+	/** Check if should print on the log the percentage of destroyed chunks */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DestructibleComponent)
+		bool printDestructionPercentage = false;
+
+	/** How much time the destructible delays its deletion after checking the level of destruction threshold */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DestructibleComponent)
+		float timerToDestroy = 1;
+
+	/** Percentage of destruction at which the destructible will delete itself from existence*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DestructibleComponent)
+		float destructionPercentageThreshold = 80;
+
+	/** impulse on fracture*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DestructibleComponent)
+		float impulseOnFracture = 50000;
+
+	/** Distance Limit at Which the destructible will delete itself*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DestructibleComponent)
+		float destruction_Distance_Limit = 100;
+
+	/* Current distance to the origin of the destructible */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = DestructibleComponent)
+		float current_Distance_To_Origin = 0;
+
+	/* Initial location of the destructible*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = DestructibleComponent)
+		TArray<FVector> initial_Location;
+
+	/* current location of the destructible*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = DestructibleComponent)
+		TArray<FVector> current_Location;
+
+	/* current names of the bones*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = DestructibleComponent)
+		TArray<FName> bones_Names;
+
+	bool firstTime = true;
+	bool destroying = false;
+	bool checking_destruction = false;
+
+	/** End of extra variab les by Xenophont */
+
 	/** If set, use this actor's fracture effects instead of the asset's fracture effects. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=DestructibleComponent)
 	uint32 bFractureEffectOverride:1;
@@ -91,6 +139,22 @@ class APEXDESTRUCTION_API UDestructibleComponent : public USkinnedMeshComponent,
 	virtual void Serialize(FArchive& Ar) override;
 #endif
 	//~ End UObject Interface.
+
+	/** Extra functions by Xenophont */
+
+	// Check if the destruction was enough to kill the actor
+	UFUNCTION(BlueprintCallable, Category = "Components|Destructible")
+		bool checkIfShouldDestroy();
+
+	// Check if the destructible actor is too far from its original position, and if so destroys it
+	UFUNCTION(BlueprintCallable, Category = "Components|Destructible")
+		void checkIfShouldDestroyByDistance();
+
+	//destroy self
+	UFUNCTION(BlueprintCallable, Category = "Components|Destructible")
+		void destroySelf();
+
+	/** End of extra functions by Xenophont */
 
 	// Take damage
 	UFUNCTION(BlueprintCallable, Category="Components|Destructible")

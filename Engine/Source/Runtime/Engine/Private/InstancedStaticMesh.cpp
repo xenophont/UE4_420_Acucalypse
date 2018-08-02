@@ -1956,6 +1956,129 @@ TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingBox(const FB
 	return Result;
 }
 
+/** Extra Functions by Xenophont */
+
+
+TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereWithOffset(const FVector& Center, float Radius, FVector Offset, bool bSphereInWorldSpace) const
+{
+	TArray<int32> Result;
+
+	FSphere Sphere(Center, Radius);
+	if (bSphereInWorldSpace)
+	{
+		Sphere = Sphere.TransformBy(ComponentToWorld.Inverse());
+	}
+
+	float StaticMeshBoundsRadius = GetStaticMesh()->GetBounds().SphereRadius;
+
+	for (int32 Index = 0; Index < PerInstanceSMData.Num(); Index++)
+	{
+		const FMatrix& Matrix = PerInstanceSMData[Index].Transform;
+		FSphere InstanceSphere(Matrix.GetOrigin() + Offset, StaticMeshBoundsRadius * Matrix.GetScaleVector().GetMax());
+
+		if (Sphere.Intersects(InstanceSphere))
+		{
+			Result.Add(Index);
+		}
+	}
+
+	return Result;
+}
+
+TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereWithOffsetWithForcedScale(const FVector& Center, float Radius, FVector Offset, float ForcedScale, bool bSphereInWorldSpace, bool bShouldPrint) const
+{
+	TArray<int32> Result;
+
+	FSphere Sphere(Center, Radius);
+	if (bSphereInWorldSpace)
+	{
+		Sphere = Sphere.TransformBy(ComponentToWorld.Inverse());
+	}
+
+	float StaticMeshBoundsRadius = GetStaticMesh()->GetBounds().SphereRadius;
+
+	for (int32 Index = 0; Index < PerInstanceSMData.Num(); Index++)
+	{
+		const FMatrix& Matrix = PerInstanceSMData[Index].Transform;
+		FSphere InstanceSphere(Matrix.GetOrigin() + Offset, StaticMeshBoundsRadius * ForcedScale);
+
+		if (Sphere.Intersects(InstanceSphere))
+		{
+			Result.Add(Index);
+			if (bShouldPrint)
+			{
+				DrawDebugSphere(
+					GetWorld(),
+					Matrix.GetOrigin() + Offset,
+					StaticMeshBoundsRadius * ForcedScale,
+					32,
+					FColor(255, 0, 0),
+					true,
+					10
+				);
+			}
+		}
+	}
+
+	return Result;
+}
+
+TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereAgainstBBoxWithOffset(const FVector& Center, float Radius, FVector Offset, bool bSphereInWorldSpace, bool bShouldPrint) const
+{
+	TArray<int32> Result;
+
+	FVector Parent_Location = GetComponentToWorld().GetLocation();
+
+	FSphere Sphere(Center, Radius);
+	if (bSphereInWorldSpace)
+	{
+		Sphere = Sphere.TransformBy(ComponentToWorld.Inverse());
+	}
+
+	FVector StaticMeshBoundsExtent = GetStaticMesh()->GetBounds().BoxExtent;
+	FVector StaticMeshOrigin = GetStaticMesh()->GetBounds().Origin;
+
+	for (int32 Index = 0; Index < PerInstanceSMData.Num(); Index++)
+	{
+		const FMatrix& Matrix = PerInstanceSMData[Index].Transform;
+		//StaticMeshBoundsExtent = StaticMeshBoundsExtent * Matrix.GetScaleVector();
+
+		//FBox InstanceBox(Matrix.GetOrigin() - StaticMeshBoundsExtent + Offset, Matrix.GetOrigin() + StaticMeshBoundsExtent + Offset);
+
+		FBox InstanceBox(GetStaticMesh()->GetBoundingBox());
+		InstanceBox = InstanceBox.TransformBy(Matrix);
+
+		if (FMath::SphereAABBIntersection(Sphere, InstanceBox))
+		{
+			if (bShouldPrint)
+			{
+				DrawDebugBox(
+					GetWorld(),
+					InstanceBox.GetCenter() + Parent_Location + Offset, //+ Matrix.GetOrigin() + FVector(0,400,0),
+					InstanceBox.GetExtent(),
+					FColor(255, 0, 0),
+					true,
+					20
+				);
+
+				/*DrawDebugBox(
+				GetWorld(),
+				Matrix.GetOrigin() + Offset,
+				StaticMeshBoundsExtent,
+				FColor(255, 0, 0),
+				true,
+				10
+				);*/
+			}
+
+			Result.Add(Index);
+		}
+	}
+
+	return Result;
+}
+/** End of extra functions */
+
 bool UInstancedStaticMeshComponent::ShouldCreatePhysicsState() const
 {
 	return IsRegistered() && !IsBeingDestroyed() && GetStaticMesh() && (bAlwaysCreatePhysicsState || IsCollisionEnabled());
