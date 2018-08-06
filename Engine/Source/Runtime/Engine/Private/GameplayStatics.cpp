@@ -756,6 +756,30 @@ void UGameplayStatics::GetAllActorsOfClass(const UObject* WorldContextObject, TS
 	}
 }
 
+
+void UGameplayStatics::GetAllActorsOfClassInLevel(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors, FString levelName)
+{
+	QUICK_SCOPE_CYCLE_COUNTER(UGameplayStatics_GetAllActorsOfClass);
+	OutActors.Empty();
+
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject);
+
+	// We do nothing if not class provided, rather than giving ALL actors!
+	if (ActorClass && World)
+	{
+		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
+		{
+			AActor* Actor = *It;
+			ULevel *LevObj = Actor->GetLevel();
+			if (!Actor->IsPendingKill() && LevObj->GetOuter()->GetName().Equals(levelName))
+			{
+				OutActors.Add(Actor);
+			}
+		}
+	}
+}
+
+
 void UGameplayStatics::GetAllActorsWithInterface(const UObject* WorldContextObject, TSubclassOf<UInterface> Interface, TArray<AActor*>& OutActors)
 {
 	QUICK_SCOPE_CYCLE_COUNTER(UGameplayStatics_GetAllActorsWithTag);

@@ -82,6 +82,18 @@ class ENGINE_API UGameplayStatics : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, Category="Utilities",  meta=(WorldContext="WorldContextObject", DeterminesOutputType="ActorClass", DynamicOutputParam="OutActors"))
 	static void GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors);
 
+
+	/**
+	*	Custom function by Javier de No - finds all actors of class in the level specified
+	*	Find all Actors in the world of the specified class.
+	*	This is a slow operation, use with caution e.g. do not use every frame.
+	*	@param	ActorClass	Class of Actor to find. Must be specified or result array will be empty.
+	*	@param	OutActors	Output array of Actors of the specified class.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Utilities", meta = (WorldContext = "WorldContextObject", DeterminesOutputType = "ActorClass", DynamicOutputParam = "OutActors"))
+		static void GetAllActorsOfClassInLevel(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors, FString levelName);
+
+
 	/** 
 	 *	Find all Actors in the world with the specified interface.
 	 *	This is a slow operation, use with caution e.g. do not use every frame.
