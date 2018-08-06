@@ -1,0 +1,12 @@
+UnrealBuildTool.GuardedMain: Command line: "D:\EpicGit\UnrealEngine_420\Engine\Source\Programs\UnrealBuildTool\bin\x64\Development\UnrealBuildTool.exe"
+UnrealBuildTool.GuardedMain: ERROR: UnrealBuildTool Exception: System.IO.DirectoryNotFoundException: Could not find a part of the path 'D:\EpicGit\UnrealEngine_420\Engine\Source\Programs\UnrealBuildTool\Engine\Config'.
+UnrealBuildTool.GuardedMain:           at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+UnrealBuildTool.GuardedMain:           at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+UnrealBuildTool.GuardedMain:           at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+UnrealBuildTool.GuardedMain:           at System.IO.Directory.EnumerateFiles(String path, String searchPattern, SearchOption searchOption)
+UnrealBuildTool.GuardedMain:           at UnrealBuildTool.DataDrivenPlatformInfo.GetDataDrivenInfoForPlatform(String PlatformName) in D:\EpicGit\UnrealEngine_420\Engine\Source\Programs\UnrealBuildTool\System\DataDrivenPlatformInfo.cs:line 78
+UnrealBuildTool.GuardedMain:           at UnrealBuildTool.ConfigHierarchy.GetIniPlatformParentName(String IniPlatformName) in D:\EpicGit\UnrealEngine_420\Engine\Source\Programs\UnrealBuildTool\System\ConfigHierarchy.cs:line 852
+UnrealBuildTool.GuardedMain:           at UnrealBuildTool.ConfigHierarchy.<EnumerateConfigFileLocations>d__22.MoveNext() in D:\EpicGit\UnrealEngine_420\Engine\Source\Programs\UnrealBuildTool\System\ConfigHierarchy.cs:line 710
+UnrealBuildTool.GuardedMain:           at UnrealBuildTool.ConfigCache.ReadHierarchy(ConfigHierarchyType Type, DirectoryReference ProjectDir, UnrealTargetPlatform Platform, DirectoryReference GeneratedConfigDir) in D:\EpicGit\UnrealEngine_420\Engine\Source\Programs\UnrealBuildTool\System\ConfigCache.cs:line 173
+UnrealBuildTool.GuardedMain:           at UnrealBuildTool.ConfigCache.ReadSettings(DirectoryReference ProjectDir, UnrealTargetPlatform Platform, Object TargetObject) in D:\EpicGit\UnrealEngine_420\Engine\Source\Programs\UnrealBuildTool\System\ConfigCache.cs:line 279
+UnrealBuildTool.GuardedMain:           at UnrealBuildTool.UnrealBuildTool.GuardedMain(String[] Arguments) in D:\EpicGit\UnrealEngine_420\Engine\Source\Programs\UnrealBuildTool\UnrealBuildTool.cs:line 629

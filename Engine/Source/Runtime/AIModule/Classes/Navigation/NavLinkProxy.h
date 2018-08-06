@@ -25,6 +25,7 @@ class AIMODULE_API ANavLinkProxy : public AActor, public INavLinkHostInterface, 
 {
 	GENERATED_UCLASS_BODY()
 
+public:
 	/** Navigation links (point to point) added to navigation data */
 	UPROPERTY(EditAnywhere, Category=SimpleLink)
 	TArray<FNavigationLink> PointLinks;

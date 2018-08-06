@@ -1966,7 +1966,7 @@ TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereWithOf
 	FSphere Sphere(Center, Radius);
 	if (bSphereInWorldSpace)
 	{
-		Sphere = Sphere.TransformBy(ComponentToWorld.Inverse());
+		Sphere = Sphere.TransformBy(GetComponentToWorld().Inverse());
 	}
 
 	float StaticMeshBoundsRadius = GetStaticMesh()->GetBounds().SphereRadius;
@@ -1992,7 +1992,7 @@ TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereWithOf
 	FSphere Sphere(Center, Radius);
 	if (bSphereInWorldSpace)
 	{
-		Sphere = Sphere.TransformBy(ComponentToWorld.Inverse());
+		Sphere = Sphere.TransformBy(GetComponentToWorld().Inverse());
 	}
 
 	float StaticMeshBoundsRadius = GetStaticMesh()->GetBounds().SphereRadius;
@@ -2006,7 +2006,7 @@ TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereWithOf
 		{
 			Result.Add(Index);
 			if (bShouldPrint)
-			{
+			{/*
 				DrawDebugSphere(
 					GetWorld(),
 					Matrix.GetOrigin() + Offset,
@@ -2016,6 +2016,7 @@ TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereWithOf
 					true,
 					10
 				);
+				*/
 			}
 		}
 	}
@@ -2032,7 +2033,7 @@ TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereAgains
 	FSphere Sphere(Center, Radius);
 	if (bSphereInWorldSpace)
 	{
-		Sphere = Sphere.TransformBy(ComponentToWorld.Inverse());
+		Sphere = Sphere.TransformBy(GetComponentToWorld().Inverse());
 	}
 
 	FVector StaticMeshBoundsExtent = GetStaticMesh()->GetBounds().BoxExtent;
@@ -2051,7 +2052,7 @@ TArray<int32> UInstancedStaticMeshComponent::GetInstancesOverlappingSphereAgains
 		if (FMath::SphereAABBIntersection(Sphere, InstanceBox))
 		{
 			if (bShouldPrint)
-			{
+			{/*
 				DrawDebugBox(
 					GetWorld(),
 					InstanceBox.GetCenter() + Parent_Location + Offset, //+ Matrix.GetOrigin() + FVector(0,400,0),
