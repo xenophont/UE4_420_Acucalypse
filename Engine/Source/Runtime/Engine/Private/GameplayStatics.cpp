@@ -762,7 +762,7 @@ void UGameplayStatics::GetAllActorsOfClassInLevel(const UObject* WorldContextObj
 	QUICK_SCOPE_CYCLE_COUNTER(UGameplayStatics_GetAllActorsOfClass);
 	OutActors.Empty();
 
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject);
+	UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
 
 	// We do nothing if not class provided, rather than giving ALL actors!
 	if (ActorClass && World)
