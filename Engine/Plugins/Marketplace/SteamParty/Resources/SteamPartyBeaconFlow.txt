@@ -1,0 +1,73 @@
+Steam Party Beacon Login Flow Summary
+
+//Client Beacon:
+InitBeaconClient(InviteResult)
+	BeaconClient->ConnectToLobby(DesiredHost)
+		InitClient(ConnectURL)
+			SendInitialJoin();
+SessionInt->JoinSession(0, PartySessionName, InviteResult)
+
+
+//Server Beacon(NMT_Hello):
+AOnlineBeaconHost::NotifyControlMessage(UNetConnection* Connection, uint8 MessageType, class FInBunch& Bunch)
+	FNetControlMessage<NMT_Hello>::Receive(Bunch, IsLittleEndian, RemoteNetworkVersion);
+	FNetControlMessage<NMT_BeaconWelcome>::Send(Connection);
+	
+	
+//Client Beacon(NMT_BeaconWelcome):
+AOnlineBeaconClient::NotifyControlMessage(UNetConnection* Connection, uint8 MessageType, class FInBunch& Bunch)
+	FNetControlMessage<NMT_Netspeed>::Send(Connection, Connection->CurrentNetSpeed);
+	FNetControlMessage<NMT_BeaconJoin>::Send(Connection, BeaconType, UniqueIdRepl);
+	
+	
+//Server Beacon(NMT_BeaconJoin):
+AOnlineBeaconHost::NotifyControlMessage(UNetConnection* Connection, uint8 MessageType, class FInBunch& Bunch)
+	FNetControlMessage<NMT_BeaconJoin>::Receive(Bunch, BeaconType, UniqueId);
+	--(SpawnBeaconType on Server and connect it to the already spawned Client Beacon)--
+	FNetControlMessage<NMT_BeaconAssignGUID>::Send(Connection, NetGUID);
+
+	
+//Client Beacon(NMT_BeaconAssignGUID):
+AOnlineBeaconClient::NotifyControlMessage(UNetConnection* Connection, uint8 MessageType, class FInBunch& Bunch)
+	FNetControlMessage<NMT_BeaconAssignGUID>::Receive(Bunch, NetGUID);
+	FNetControlMessage<NMT_BeaconNetGUIDAck>::Send(Connection, BeaconType);
+	
+	
+//Server Beacon(NMT_BeaconNetGUIDAck):
+AOnlineBeaconHost::NotifyControlMessage(UNetConnection* Connection, uint8 MessageType, class FInBunch& Bunch)
+	FNetControlMessage<NMT_BeaconNetGUIDAck>::Receive(Bunch, BeaconType);
+	ClientActor->ClientOnConnected();  // Send an RPC to the client to open the actor channel and guarantee RPCs will work
+	
+	
+//Client Beacon:
+AOnlineBeaconClient::ClientOnConnected_Implementation()
+	OnConnected()
+		LoginLocalPlayers();
+			ServerLoginPlayer(DestSessionId, UniqueIdRepl, UrlString);
+			
+
+//Server Beacon:
+ASteamBeaconClient::ServerLoginPlayer_Implementation(const FString& InSessionId, const FUniqueNetIdRepl& InUniqueId, const FString& UrlString)
+	ASteamBeaconHost::ProcessPlayerLogin(ASteamBeaconClient* ClientActor, const FString& InSessionId, const FUniqueNetIdRepl& InUniqueId, const FString& UrlString)
+		ASteamBeaconPlayerState* NewPlayer = HandlePlayerLoginOverride(ClientActor, InUniqueId, Options);
+		--(Setup Player State & transmit info to other connected clients)--
+		ClientActor->ClientLoginCompleteOverride(InUniqueId, bSuccess);
+			ClientLoginComplete(InUniqueId, bWasSuccessful)
+		PostLogin(ClientActor);
+			
+//Client Beacon:			
+ALobbyBeaconClient::ClientLoginComplete_Implementation(const FUniqueNetIdRepl& InUniqueId, bool bWasSuccessful)		
+	OnLoginComplete()
+	
+			
+			
+			
+			
+			
+	
+	
+	
+	
+	
+	
+	

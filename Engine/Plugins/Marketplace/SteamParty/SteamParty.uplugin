@@ -1,0 +1,36 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.9",
+	"FriendlyName": "SteamParty, Beacons for Party and Lobby Matchmaking",
+	"Description": "A complete Party System integrated for the Steam Online System.",
+	"Category": "Steam",
+	"CreatedBy": "W3 Studios",
+	"CreatedByURL": "http://www.w3studios.net/",
+	"DocsURL": "http://www.youtube.com/watch?v=ZPvtouFCjWs&list=PLV-dIR06Tap-dd8VjgVNa-EDn1WHxsMkd",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/f2b6aed938d746a58802720a8a6487cf",
+	"SupportURL": "https://discord.gg/Bbycgmz",
+	"EngineVersion": "4.20.0",
+	"CanContainContent": true,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "SteamParty",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "OnlineFramework",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystemSteam",
+			"Enabled": true
+		}
+	]
+}
