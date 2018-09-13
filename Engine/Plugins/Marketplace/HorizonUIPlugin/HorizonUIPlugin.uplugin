@@ -1,0 +1,37 @@
+{
+	"FileVersion": 3,
+	"Version": 165,
+	"VersionName": "4.20.0",
+	"FriendlyName": "Horizon UI Plugin",
+	"Description": "Horizon UMG extension for UE4",
+	"Category": "Horizon",
+	"CreatedBy": "dorgon chang",
+	"CreatedByURL": "http://dorgon.horizon-studio.net",
+	"DocsURL": "https://github.com/dorgonman/HorizonUIPluginDemo",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/8b94d073d32443b497d4a9e8b1e210f7",
+	"SupportURL": "http://dorgon.horizon-studio.net",
+	"EngineVersion": "4.20.0",
+	"CanContainContent": false,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "HorizonUI",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"IOS",
+				"Android",
+				"HTML5"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Paper2D",
+			"Enabled": true
+		}
+	]
+}
